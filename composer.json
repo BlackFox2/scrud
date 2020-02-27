@@ -1,0 +1,31 @@
+{
+  "name": "blackfox2/scrud",
+  "type": "library",
+  "description": "SCRUD (Search, Create, Read, Update, Delete) table engine for BlackFox2 project",
+  "autoload": {
+    "classmap": [
+      "src/"
+    ]
+  },
+  "autoload-dev": {
+    "classmap": [
+      "testing/"
+    ]
+  },
+  "require": {
+    "blackfox2/common": "dev-master"
+  },
+  "require-dev": {
+    "blackfox2/testing": "dev-master"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/BlackFox2/common"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/BlackFox2/testing"
+    }
+  ]
+}

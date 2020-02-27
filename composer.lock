@@ -1,0 +1,79 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "413028cf79c51c18ae3e9778b39fbba6",
+    "packages": [
+        {
+            "name": "blackfox2/common",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BlackFox2/common.git",
+                "reference": "40207ecd5a27ed63dcd839cc1352685539c248db"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BlackFox2/common/zipball/40207ecd5a27ed63dcd839cc1352685539c248db",
+                "reference": "40207ecd5a27ed63dcd839cc1352685539c248db",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "description": "Common classes for BlackFox2 project",
+            "support": {
+                "source": "https://github.com/BlackFox2/common/tree/master",
+                "issues": "https://github.com/BlackFox2/common/issues"
+            },
+            "time": "2020-02-27T14:34:46+00:00"
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "blackfox2/testing",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BlackFox2/testing.git",
+                "reference": "4b33589f7f3a661cb1333327b3efe93bd27c8fc6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BlackFox2/testing/zipball/4b33589f7f3a661cb1333327b3efe93bd27c8fc6",
+                "reference": "4b33589f7f3a661cb1333327b3efe93bd27c8fc6",
+                "shasum": ""
+            },
+            "require": {
+                "blackfox2/common": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "description": "Testing classes for BlackFox2 project",
+            "support": {
+                "source": "https://github.com/BlackFox2/testing/tree/master",
+                "issues": "https://github.com/BlackFox2/testing/issues"
+            },
+            "time": "2020-02-27T14:35:19+00:00"
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "blackfox2/common": 20,
+        "blackfox2/testing": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
