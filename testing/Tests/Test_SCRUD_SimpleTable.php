@@ -10,16 +10,16 @@ class Test_SCRUD_SimpleTable extends Test {
 	/** @var SimpleTable */
 	private $SimpleTable;
 
-	/** Getting an instance of Entities\SimpleTable */
-	public function TestGetInstance() {
+	/** Getting a new instance of SimpleTable */
+	public function TestGetNewInstance() {
 		$this->SimpleTable = SimpleTable::N();
 	}
 
-	/** fields synchronization */
-	public function TestSynchronize() {
+	/** Schema synchronization */
+	public function TestSchemaSynchronize() {
 		$Schema = Schema::N();
-		$Schema->setTables([$this->SimpleTable]);
-		$Schema->synchronize();
+		$Schema->SetTables([$this->SimpleTable]);
+		$Schema->Synchronize();
 	}
 
 	/** Deleting of all records */
@@ -56,7 +56,7 @@ class Test_SCRUD_SimpleTable extends Test {
 	public function TestCreateBadRow() {
 		try {
 			$this->SimpleTable->Create(['ENUM' => 'BAD_VALUE']);
-		} catch (\Exception $error) {
+		} catch (Exception $error) {
 			return $error->getMessage();
 		}
 		throw new Exception('An error was expected when trying to insert an unknown value in the ENUM type field');
@@ -66,7 +66,7 @@ class Test_SCRUD_SimpleTable extends Test {
 	public function TestUpdateBadRow() {
 		try {
 			$this->SimpleTable->Update(1, ['ENUM' => 'BAD_VALUE']);
-		} catch (\Exception $error) {
+		} catch (Exception $error) {
 			return $error->getMessage();
 		}
 		throw new Exception('An error was expected while trying to update an unknown value in the ENUM type field');

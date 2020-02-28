@@ -16,11 +16,11 @@ class Schema {
 		$this->DB = $DB;
 	}
 
-	public function setTables(array $Tables) {
+	public function SetTables(array $Tables) {
 		$this->Tables = $Tables;
 	}
 
-	public function synchronize() {
+	public function Synchronize() {
 		foreach ($this->Tables as $Table) {
 			$Table->DropConstraints();
 		}
@@ -32,7 +32,7 @@ class Schema {
 		}
 	}
 
-	public function drop() {
+	public function Drop() {
 		foreach (array_reverse($this->Tables) as $Table) {
 			$Table->Drop();
 		}

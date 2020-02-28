@@ -501,18 +501,6 @@ abstract class SCRUD {
 	}
 
 	/**
-	 * Проверяет массив полей, передаваемый в Create и Update методы.
-	 * Проверка идет независимо от идентификатора (ID).
-	 * Переопределяется в классах-наследниках для реализации логики контроля за полями.
-	 *
-	 * @param array $fields поля
-	 * @return array поля
-	 */
-	public function ControlFields($fields = []) {
-		return $fields;
-	}
-
-	/**
 	 * Создает новую строку в таблице и возвращает ее идентификатор
 	 *
 	 * @param array $fields ассоциативный массив полей для новой строки
@@ -520,8 +508,6 @@ abstract class SCRUD {
 	 * @throws Exception
 	 */
 	public function Create($fields) {
-
-		$fields = $this->ControlFields($fields);
 
 		if (empty($fields)) {
 			$this->SQL = "INSERT INTO {$this->code} VALUES ()";
@@ -565,8 +551,6 @@ abstract class SCRUD {
 	 * @throws Exception Поле ... не может быть пустым
 	 */
 	public function Update($filter = [], $fields = []) {
-
-		$fields = $this->ControlFields($fields);
 
 		if (empty($fields)) {
 			throw new Exception("No data to update");

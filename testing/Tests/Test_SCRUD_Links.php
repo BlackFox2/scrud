@@ -7,13 +7,16 @@ class Test_SCRUD_Links extends Test {
 	public $name = 'SCRUD: one-many, many-one, many-many links';
 
 	/** @var Grades $Grades */
-	public $Grades = null;
+	public $Grades;
 	/** @var Students $Students */
-	public $Students = null;
+	public $Students;
 	/** @var Rooms $Rooms */
-	public $Rooms = null;
+	public $Rooms;
 	/** @var Timetable $Timetable */
-	public $Timetable = null;
+	public $Timetable;
+
+	/** @var Schema $Schema */
+	public $Schema;
 
 	public function __construct() {
 		parent::__construct();
@@ -21,50 +24,77 @@ class Test_SCRUD_Links extends Test {
 		$this->Rooms = Rooms::N();
 		$this->Timetable = Timetable::N();
 		$this->Students = Students::N();
-	}
 
-	/** test drop tables */
-	public function TestDrop() {
-		$Schema = Schema::N();
-		$Schema->setTables([
+		$this->Schema = Schema::N();
+		$this->Schema->SetTables([
 			$this->Grades,
 			$this->Rooms,
 			$this->Timetable,
 			$this->Students,
 		]);
-		$Schema->drop();
 	}
 
-	/** fields synchronization */
-	public function TestSynchronize() {
-		$Schema = Schema::N();
-		$Schema->setTables([
-			$this->Grades,
-			$this->Rooms,
-			$this->Timetable,
-			$this->Students,
-		]);
-		$Schema->synchronize();
+	/** Schema drop */
+	public function TestSchemaDrop() {
+		$this->Schema->Drop();
+	}
+
+	/** Schema synchronize */
+	public function TestSchemaSynchronize() {
+		$this->Schema->Synchronize();
 	}
 
 	public function TestFillRooms() {
-		$this->Rooms->Fill();
+		$rooms = [101, 102, 103, 104, 105, 106, 107, 201, 203, 205, 207, 209, 301, 304, 307, 311];
+		foreach ($rooms as $room) {
+			$this->Rooms->Create(['TITLE' => 'R-' . $room]);
+		}
 	}
 
 	public function TestFillGrades() {
-		$this->Grades->Fill();
+		foreach (['A', 'B', 'C'] as $class_letter) {
+			foreach ([1, 2, 3, 4, 5, 7, 8, 9, 10, 11] as $class_number) {
+				$this->Grades->Create([
+					'TITLE' => $class_number . $class_letter,
+				]);
+			}
+		}
 	}
 
 	public function TestFillStudents() {
-		$this->Students->Fill(100);
+		$names = file(__DIR__ . '/data/names.txt', FILE_IGNORE_NEW_LINES);
+		$lasts = ['J', 'G', 'V', 'X', 'Z'];
+		$grade_ids = $this->Grades->GetColumn();
+		if (empty($grade_ids)) {
+			throw new Exception("No grades has been found");
+		}
+		for ($i = 0; $i < 100; $i++) {
+			$this->Students->Create([
+				'FIRST_NAME' => $names[array_rand($names)],
+				'LAST_NAME'  => $lasts[array_rand($lasts)] . '.',
+				'GRADE'      => $grade_ids[array_rand($grade_ids)],
+			]);
+		}
 	}
 
 	public function TestFillGradesCaptains() {
-		$this->Grades->FillCaptains();
+		$grade_ids = $this->Grades->GetColumn();
+		$students_ids = $this->Students->GetColumn();
+		foreach ($grade_ids as $grade_id) {
+			$this->Grades->Update($grade_id, ['CAPTAIN' => $students_ids[array_rand($students_ids)]]);
+		}
 	}
 
 	public function TestFillTimetable() {
-		$this->Timetable->Fill(300);
+		$grade_ids = $this->Grades->GetColumn();
+		$rooms_ids = $this->Rooms->GetColumn();
+		for ($i = 0; $i < 300; $i++) {
+			$this->Timetable->Create([
+				'GRADE' => $grade_ids[array_rand($grade_ids)],
+				'ROOM'  => $rooms_ids[array_rand($rooms_ids)],
+				'START' => time() + $i * 3600,
+			]);
+		}
 	}
 
 	/** Test of reading a random element (student), checking the structure */
