@@ -5,6 +5,8 @@ namespace BlackFox2;
 class TypeInner extends Type {
 	public static $TYPE = 'INNER';
 
+	public $virtual = true;
+
 	public function ProvideInfoIntegrity() {
 		if (empty($this->info['FIELD'])) {
 			throw new Exception("For '{$this->info['CODE']}' field of type INNER you must specify FIELD info");

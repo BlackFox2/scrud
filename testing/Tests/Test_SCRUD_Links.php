@@ -46,19 +46,21 @@ class Test_SCRUD_Links extends Test {
 
 	public function TestFillRooms() {
 		$rooms = [101, 102, 103, 104, 105, 106, 107, 201, 203, 205, 207, 209, 301, 304, 307, 311];
+		$elements = [];
 		foreach ($rooms as $room) {
-			$this->Rooms->Create(['TITLE' => 'R-' . $room]);
+			$elements[] = ['TITLE' => 'R-' . $room];
 		}
+		$this->Rooms->Insert($elements);
 	}
 
 	public function TestFillGrades() {
+		$elements = [];
 		foreach (['A', 'B', 'C'] as $class_letter) {
 			foreach ([1, 2, 3, 4, 5, 7, 8, 9, 10, 11] as $class_number) {
-				$this->Grades->Create([
-					'TITLE' => $class_number . $class_letter,
-				]);
+				$elements[] = ['TITLE' => $class_number . $class_letter];
 			}
 		}
+		$this->Grades->Insert($elements);
 	}
 
 	public function TestFillStudents() {
@@ -68,16 +70,18 @@ class Test_SCRUD_Links extends Test {
 		if (empty($grade_ids)) {
 			throw new Exception("No grades has been found");
 		}
+		$elements = [];
 		for ($i = 0; $i < 100; $i++) {
-			$this->Students->Create([
+			$elements[] = [
 				'FIRST_NAME' => $names[array_rand($names)],
 				'LAST_NAME'  => $lasts[array_rand($lasts)] . '.',
 				'GRADE'      => $grade_ids[array_rand($grade_ids)],
-			]);
+			];
 		}
+		$this->Students->Insert($elements);
 	}
 
-	public function TestFillGradesCaptains() {
+	public function TestLinkAllGradesToRandomCaptains() {
 		$grade_ids = $this->Grades->GetColumn();
 		$students_ids = $this->Students->GetColumn();
 		foreach ($grade_ids as $grade_id) {
@@ -88,13 +92,42 @@ class Test_SCRUD_Links extends Test {
 	public function TestFillTimetable() {
 		$grade_ids = $this->Grades->GetColumn();
 		$rooms_ids = $this->Rooms->GetColumn();
-		for ($i = 0; $i < 300; $i++) {
-			$this->Timetable->Create([
+		$elements = [];
+		for ($i = 0; $i < 500; $i++) {
+			$elements[] = [
 				'GRADE' => $grade_ids[array_rand($grade_ids)],
 				'ROOM'  => $rooms_ids[array_rand($rooms_ids)],
 				'START' => time() + $i * 3600,
-			]);
+				// DURATION = DEFAULT
+			];
 		}
+		$this->Timetable->Insert($elements);
+	}
+
+	public function TestWrongAttemptToCreateTimetable() {
+		try {
+			$ID = $this->Timetable->Create([
+				'GRADE' => 3000,
+				'ROOM'  => 3000,
+				'START' => time(),
+			]);
+		} catch (ExceptionSQL $error) {
+			return $error->getMessage();
+		}
+		throw new Exception("Wrong timetable was created: #{$ID}");
+	}
+
+	public function TestWrongAttemptToInsertTimetable() {
+		try {
+			$this->Timetable->Insert([[
+				'GRADE' => 3000,
+				'ROOM'  => 3000,
+				'START' => time(),
+			]]);
+		} catch (ExceptionSQL $error) {
+			return $error->getMessage();
+		}
+		throw new Exception("Wrong timetable was inserted!");
 	}
 
 	/** Test of reading a random element (student), checking the structure */

@@ -9,6 +9,8 @@ namespace BlackFox2;
  */
 abstract class Type implements \ArrayAccess {
 
+	public $virtual = false;
+
 	protected function Quote($id) {
 		return $this->DB->Quote($id);
 	}

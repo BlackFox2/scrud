@@ -501,44 +501,78 @@ abstract class SCRUD {
 	}
 
 	/**
+	 * Создает новые строки в таблице
+	 *
+	 * @param array $elements лист ассоциативных массивов полей для новых строк
+	 * @throws Exception
+	 */
+	public function Insert($elements) {
+
+		$errors = [];
+		foreach ($elements as $element)
+			foreach ($this->fields as $code => $field)
+				if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT']))
+					if (!$this->_hasInformation($element[$code]))
+						$errors[] = "Field must be specified: '{$field['NAME']}'";
+		if ($errors) throw new Exception($errors);
+
+		$codes = [];
+		foreach ($this->fields as $code => $field)
+			if (!$field->virtual)
+				$codes[] = $this->DB->Quote($code);
+
+		$rows = [];
+		foreach ($elements as $element) {
+			$values = [];
+			foreach ($this->fields as $code => $field) {
+				if ($field->virtual) continue;
+				if (array_key_exists($code, $element)) {
+					$value = $this->_formatFieldValue($code, $element[$code]);
+					$values[] = is_null($value) ? 'NULL' : "'{$value}'";
+				} else {
+					$values[] = 'DEFAULT';
+				}
+			}
+			$rows[] = "\r\n" . '(' . implode(', ', $values) . ')';
+		}
+
+		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ") \r\n VALUES " . implode(', ', $rows);
+		$this->DB->Query($this->SQL);
+	}
+
+	/**
 	 * Создает новую строку в таблице и возвращает ее идентификатор
 	 *
-	 * @param array $fields ассоциативный массив полей для новой строки
+	 * @param array $element ассоциативный массив полей для новой строки
 	 * @return int|string идентификатор созданной строки
 	 * @throws Exception
 	 */
-	public function Create($fields) {
+	public function Create($element) {
 
-		if (empty($fields)) {
+		if (empty($element)) {
 			$this->SQL = "INSERT INTO {$this->code} VALUES ()";
-			return $this->DB->QuerySingleInsert($this->SQL);
+			return $this->DB->QuerySingleInsert($this->SQL, $this->increment);
 		}
 
 		$errors = [];
-		foreach ($this->fields as $code => $field) {
-			if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT'])) {
-				if (!$this->_hasInformation($fields[$code])) {
+		foreach ($this->fields as $code => $field)
+			if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT']))
+				if (!$this->_hasInformation($element[$code]))
 					$errors[] = "Field must be specified: '{$field['NAME']}'";
-				}
-			}
-		}
-		if ($errors) {
-			throw new Exception($errors);
-		}
-
+		if ($errors) throw new Exception($errors);
 
 		$codes = [];
 		$values = [];
 
 		foreach ($this->fields as $code => $field) {
-			if (array_key_exists($code, $fields)) {
+			if (array_key_exists($code, $element)) {
 				$codes[] = $this->DB->Quote($code);
-				$value = $this->_formatFieldValue($code, $fields[$code]);
+				$value = $this->_formatFieldValue($code, $element[$code]);
 				$values[] = is_null($value) ? 'NULL' : "'{$value}'";
 			}
 		}
-		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ") \r\n VALUES (" . implode(', ', $values) . ')';
 
+		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ") \r\n VALUES (" . implode(', ', $values) . ')';
 		return $this->DB->QuerySingleInsert($this->SQL, $this->increment);
 	}
 
@@ -546,13 +580,13 @@ abstract class SCRUD {
 	 * Изменяет значения указанных элементов.
 	 *
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
-	 * @param array $fields ассоциативный массив изменяемых полей
+	 * @param array $element ассоциативный массив изменяемых полей
 	 * @throws Exception Нет информации для обновления
 	 * @throws Exception Поле ... не может быть пустым
 	 */
-	public function Update($filter = [], $fields = []) {
+	public function Update($filter = [], $element = []) {
 
-		if (empty($fields)) {
+		if (empty($element)) {
 			throw new Exception("No data to update");
 		}
 
@@ -560,8 +594,8 @@ abstract class SCRUD {
 
 		$rows = [];
 		foreach ($this->fields as $code => $field) {
-			if (array_key_exists($code, $fields)) {
-				$rows[] = $this->_prepareSet($code, $fields[$code]);
+			if (array_key_exists($code, $element)) {
+				$rows[] = $this->_prepareSet($code, $element[$code]);
 			}
 		}
 		if (empty($rows)) {
